@@ -4,11 +4,13 @@ module TheLocal
   # An immutable description of one Claude Code subagent contributed by a
   # provider (a gem or the app). Renders to a `.claude/agents/*.md` definition.
   #
-  # +knowledge+ is a string or array of strings appended below the role body —
-  # the provider's single-source reference(s).
-  Agent = Data.define(:provider, :name, :description, :tools, :body, :knowledge) do
+  # +gem_name+ is the providing gem (used to filter to a host's direct
+  # dependencies). +prefix+ is the filename namespace (often a shorter alias,
+  # e.g. gem "keystone_ui" → prefix "keystone"). +knowledge+ is a string or
+  # array of strings appended below the role body — the provider's reference(s).
+  Agent = Data.define(:gem_name, :prefix, :name, :description, :tools, :body, :knowledge) do
     def qualified_name
-      "#{provider}-#{name}"
+      "#{prefix}-#{name}"
     end
 
     def filename

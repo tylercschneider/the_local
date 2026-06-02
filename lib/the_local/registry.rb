@@ -20,17 +20,18 @@ module TheLocal
   end
 
   # Yielded to a provider's register block. Turns each `agent` call into an
-  # Agent namespaced under that provider.
+  # Agent tagged with the providing gem and namespaced under its prefix.
   class Collector
-    def initialize(provider, registry)
-      @provider = provider
+    def initialize(gem_name, prefix, registry)
+      @gem_name = gem_name
+      @prefix = prefix
       @registry = registry
     end
 
     def agent(name, description:, tools:, body:, knowledge: nil)
       @registry.add(
-        Agent.new(provider: @provider, name: name, description: description,
-                  tools: tools, body: body, knowledge: knowledge)
+        Agent.new(gem_name: @gem_name, prefix: @prefix, name: name,
+                  description: description, tools: tools, body: body, knowledge: knowledge)
       )
     end
   end

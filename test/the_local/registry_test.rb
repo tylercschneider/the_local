@@ -9,7 +9,7 @@ module TheLocal
     end
 
     def register_scaffold
-      TheLocal.register("keystone") do |c|
+      TheLocal.register("keystone_ui", prefix: "keystone") do |c|
         c.agent "scaffold",
                 description: "Use PROACTIVELY for UI work.",
                 tools: "Read, Write, Edit",
@@ -22,6 +22,12 @@ module TheLocal
       register_scaffold
 
       assert_equal ["keystone-scaffold.md"], TheLocal.registry.agents.map(&:filename)
+    end
+
+    def test_register_records_the_gem_name_for_dependency_filtering
+      register_scaffold
+
+      assert_equal ["keystone_ui"], TheLocal.registry.agents.map(&:gem_name)
     end
 
     def test_register_accumulates_agents_across_providers
