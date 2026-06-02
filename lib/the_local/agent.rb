@@ -24,6 +24,8 @@ module TheLocal
         ---
 
         #{body}
+
+        #{knowledge}
       MARKDOWN
     end
   end
