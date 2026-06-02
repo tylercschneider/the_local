@@ -4,6 +4,7 @@ require_relative "the_local/version"
 require_relative "the_local/agent"
 require_relative "the_local/registry"
 require_relative "the_local/installer"
+require_relative "the_local/trigger_writer"
 
 # Resident Claude Code expert subagents ("locals"), contributed by the gems and
 # app that register with it and installed into a consuming app's .claude/agents/.
