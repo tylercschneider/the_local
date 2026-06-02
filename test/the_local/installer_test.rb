@@ -30,5 +30,18 @@ module TheLocal
         assert_equal TheLocal.registry.agents.first.to_markdown, File.read(path)
       end
     end
+
+    def test_skips_providers_outside_the_allowed_gems
+      register_keystone
+      TheLocal.register("some_transitive_gem") do |c|
+        c.agent "helper", description: "…", tools: "Read", body: "…"
+      end
+
+      Dir.mktmpdir do |dir|
+        install_into(dir, allowed_gems: ["keystone_ui"])
+
+        refute_path_exists File.join(dir, ".claude/agents/some_transitive_gem-helper.md")
+      end
+    end
   end
 end
