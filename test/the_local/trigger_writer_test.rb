@@ -47,5 +47,28 @@ module TheLocal
         assert_equal "#{writer(dir).rule}\n", File.read(File.join(dir, "CLAUDE.md"))
       end
     end
+
+    def test_call_is_idempotent_across_reruns
+      register_keystone
+
+      Dir.mktmpdir do |dir|
+        writer(dir).call
+        writer(dir).call
+
+        assert_equal 1, File.read(File.join(dir, "CLAUDE.md")).scan(TriggerWriter::BEGIN_MARKER).size
+      end
+    end
+
+    def test_call_preserves_existing_claude_md_content
+      register_keystone
+
+      Dir.mktmpdir do |dir|
+        path = File.join(dir, "CLAUDE.md")
+        File.write(path, "# My App\n\nHouse rules.\n")
+        writer(dir).call
+
+        assert File.read(path).start_with?("# My App\n\nHouse rules.")
+      end
+    end
   end
 end
