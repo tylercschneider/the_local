@@ -1,21 +1,32 @@
 # frozen_string_literal: true
 
 module TheLocal
-  # Accumulates the agents contributed by every provider (gem or app) that calls
-  # TheLocal.register. The install generator reads this to write .claude/agents/.
+  # A registered provider (gem or app): its gem name, filename prefix, and a
+  # one-line scope used to generate the delegation trigger.
+  Provider = Data.define(:gem_name, :prefix, :scope)
+
+  # Accumulates the providers and agents contributed by everything that calls
+  # TheLocal.register. The install generator reads this to write .claude/agents/
+  # and the delegation trigger.
   class Registry
     def initialize
       @agents = []
+      @providers = []
     end
 
-    attr_reader :agents
+    attr_reader :agents, :providers
 
     def add(agent)
       @agents << agent
     end
 
+    def add_provider(provider)
+      @providers << provider
+    end
+
     def clear
       @agents.clear
+      @providers.clear
     end
   end
 
