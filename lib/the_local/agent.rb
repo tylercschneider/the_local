@@ -22,6 +22,8 @@ module TheLocal
         description: #{description}
         tools: #{tools}
         ---
+
+        #{body}
       MARKDOWN
     end
   end
