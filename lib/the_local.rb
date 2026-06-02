@@ -18,12 +18,14 @@ module TheLocal
     # Providers (gems or the app) call this at load time to contribute their
     # agents. The first argument is the providing gem's name (used to filter to a
     # host's direct dependencies); +prefix+ is the agent filename namespace and
-    # defaults to the gem name:
+    # defaults to the gem name; +scope+ is a one-line phrase describing the
+    # provider's domain, used to generate the delegation trigger:
     #
-    #   TheLocal.register("keystone_ui", prefix: "keystone") do |c|
+    #   TheLocal.register("keystone_ui", prefix: "keystone", scope: "UI work") do |c|
     #     c.agent "scaffold", description: "…", tools: "…", body: "…", knowledge: "…"
     #   end
-    def register(gem_name, prefix: gem_name)
+    def register(gem_name, prefix: gem_name, scope: nil)
+      registry.add_provider(Provider.new(gem_name: gem_name, prefix: prefix, scope: scope))
       yield Collector.new(gem_name, prefix, registry)
     end
 

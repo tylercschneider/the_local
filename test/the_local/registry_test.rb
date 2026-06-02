@@ -45,5 +45,16 @@ module TheLocal
 
       assert_includes TheLocal.registry.agents.first.to_markdown, "API docs."
     end
+
+    def test_register_records_the_provider_with_its_scope
+      TheLocal.register("keystone_ui", prefix: "keystone", scope: "UI — pages, forms, tables") do |c|
+        c.agent "scaffold", description: "…", tools: "Read", body: "…"
+      end
+
+      provider = TheLocal.registry.providers.first
+
+      assert_equal ["keystone_ui", "keystone", "UI — pages, forms, tables"],
+                   [provider.gem_name, provider.prefix, provider.scope]
+    end
   end
 end
