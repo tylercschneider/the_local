@@ -25,7 +25,7 @@ module TheLocal
 
         #{body}
 
-        #{knowledge}
+        #{Array(knowledge).join("\n\n")}
       MARKDOWN
     end
   end

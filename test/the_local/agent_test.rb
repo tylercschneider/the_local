@@ -34,5 +34,11 @@ module TheLocal
     def test_to_markdown_appends_string_knowledge
       assert_includes build(knowledge: "THE-API-REFERENCE").to_markdown, "THE-API-REFERENCE"
     end
+
+    def test_to_markdown_joins_array_knowledge
+      markdown = build(knowledge: %w[REFERENCE-BLOB RECIPES-BLOB]).to_markdown
+
+      assert_includes markdown, "REFERENCE-BLOB\n\nRECIPES-BLOB"
+    end
   end
 end
