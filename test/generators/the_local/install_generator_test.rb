@@ -36,6 +36,17 @@ module TheLocal
           assert_path_exists File.join(dir, "CLAUDE.md")
         end
       end
+
+      def test_wires_refresh_into_bin_setup
+        Dir.mktmpdir do |dir|
+          FileUtils.mkdir_p(File.join(dir, "bin"))
+          File.write(File.join(dir, "bin/setup"), "#!/usr/bin/env ruby\n")
+          generator = InstallGenerator.new([], {}, destination_root: dir)
+          capture_io { generator.wire_bin_setup }
+
+          assert_includes File.read(File.join(dir, "bin/setup")), "bin/rails the_local:refresh"
+        end
+      end
     end
   end
 end
