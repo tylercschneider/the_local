@@ -12,20 +12,14 @@ module TheLocal
       desc "Install the Claude Code locals of this app's direct dependencies"
 
       def install_locals
-        Installer.new(registry: TheLocal.registry, destination: destination_root, allowed_gems: allowed_gems).call
-        TriggerWriter.new(registry: TheLocal.registry, destination: destination_root, allowed_gems: allowed_gems).call
-        say "the_local: installed locals for #{allowed_gems.join(", ")}", :green
+        allowed = Sync.new(
+          registry: TheLocal.registry, destination: destination_root,
+          direct_dependencies: direct_dependencies, bundled_gems: bundled_gems
+        ).call
+        say "the_local: installed locals for #{allowed.join(", ")}", :green
       end
 
       private
-
-      def allowed_gems
-        @allowed_gems ||= Scope.allowed_gems(
-          provider_gem_names: TheLocal.registry.providers.map(&:gem_name),
-          direct_dependencies: direct_dependencies,
-          bundled_gems: bundled_gems
-        )
-      end
 
       def direct_dependencies
         Bundler.definition.dependencies.map(&:name)
