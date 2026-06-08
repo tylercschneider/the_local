@@ -20,11 +20,11 @@ module TheLocal
 
       argument :gem_name, type: :string, desc: "The providing gem's name, e.g. citizen"
       class_option :prefix, type: :string,
-                   desc: "Agent filename namespace (defaults to the gem name)"
+                            desc: "Agent filename namespace (defaults to the gem name)"
       class_option :scope, type: :string, default: "TODO: one-line phrase describing this gem's domain",
-                   desc: "One-line domain phrase used in the delegation trigger"
+                           desc: "One-line domain phrase used in the delegation trigger"
       class_option :worker, type: :string, default: "develop",
-                   desc: "Name of the domain worker facet (develop for libraries, operate for CLIs)"
+                            desc: "Name of the domain worker facet (develop for libraries, operate for CLIs)"
 
       def create_reference
         template "reference.rb.tt", "lib/#{gem_name}/reference.rb"
@@ -44,8 +44,8 @@ module TheLocal
         return if File.read(gemfile).include?(GEMFILE_LINE)
 
         append_to_file "Gemfile",
-          "\n# Optional companion: #{gem_name} registers its locals with the_local " \
-          "when present.\n# Registration is guarded, so #{gem_name} works standalone.\n#{GEMFILE_LINE}\n"
+                       "\n# Optional companion: #{gem_name} registers its locals with the_local " \
+                       "when present.\n# Registration is guarded, so #{gem_name} works standalone.\n#{GEMFILE_LINE}\n"
       end
 
       def require_from_entrypoint
@@ -54,7 +54,7 @@ module TheLocal
         return if File.read(File.join(destination_root, entrypoint)).include?(require_line)
 
         append_to_file entrypoint,
-          "\n# Register #{gem_name}'s locals when the_local is available (no-op otherwise).\n#{require_line}\n"
+                       "\n# Register #{gem_name}'s locals when the_local is available (no-op otherwise).\n#{require_line}\n"
       end
 
       private

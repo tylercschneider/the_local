@@ -52,7 +52,7 @@ module TheLocal
           run_generator_into(dir)
 
           assert_includes File.read(File.join(dir, "Gemfile")),
-            %(gem "the_local", github: "tylercschneider/the_local")
+                          %(gem "the_local", github: "tylercschneider/the_local")
         end
       end
 
@@ -71,7 +71,7 @@ module TheLocal
           run_generator_into(dir)
 
           assert_includes File.read(File.join(dir, "lib/demo.rb")),
-            %(require_relative "demo/the_local")
+                          %(require_relative "demo/the_local")
         end
       end
 
