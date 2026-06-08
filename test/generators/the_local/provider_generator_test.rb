@@ -56,6 +56,16 @@ module TheLocal
         end
       end
 
+      def test_gemfile_injection_is_idempotent_on_rerun
+        Dir.mktmpdir do |dir|
+          run_generator_into(dir)
+          rerun = ProviderGenerator.new(["demo"], {}, destination_root: dir)
+          capture_io { rerun.add_to_gemfile }
+
+          assert_equal 1, File.read(File.join(dir, "Gemfile")).scan(ProviderGenerator::GEMFILE_LINE).size
+        end
+      end
+
       def test_requires_the_companion_from_the_gem_entrypoint
         Dir.mktmpdir do |dir|
           run_generator_into(dir)
