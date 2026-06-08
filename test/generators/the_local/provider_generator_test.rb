@@ -46,6 +46,17 @@ module TheLocal
           assert_path_exists File.join(dir, "lib/demo/reference/guide.md")
         end
       end
+
+      # The scaffolded companion must register the common command interface that
+      # every provider exposes to apps: info, install, and the domain worker.
+      def test_companion_registers_the_common_command_interface
+        Dir.mktmpdir do |dir|
+          run_generator_into(dir)
+          load File.join(dir, "lib/demo/the_local.rb")
+
+          assert_equal %w[info install develop], TheLocal.registry.agents.map(&:name)
+        end
+      end
     end
   end
 end
