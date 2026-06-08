@@ -56,6 +56,15 @@ module TheLocal
         end
       end
 
+      def test_requires_the_companion_from_the_gem_entrypoint
+        Dir.mktmpdir do |dir|
+          run_generator_into(dir)
+
+          assert_includes File.read(File.join(dir, "lib/demo.rb")),
+            %(require_relative "demo/the_local")
+        end
+      end
+
       # The scaffolded companion must register the common command interface that
       # every provider exposes to apps: info, install, and the domain worker.
       def test_companion_registers_the_common_command_interface

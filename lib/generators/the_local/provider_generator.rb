@@ -48,7 +48,20 @@ module TheLocal
           "when present.\n# Registration is guarded, so #{gem_name} works standalone.\n#{GEMFILE_LINE}\n"
       end
 
+      def require_from_entrypoint
+        entrypoint = File.join("lib", "#{gem_name}.rb")
+        return unless File.exist?(File.join(destination_root, entrypoint))
+        return if File.read(File.join(destination_root, entrypoint)).include?(require_line)
+
+        append_to_file entrypoint,
+          "\n# Register #{gem_name}'s locals when the_local is available (no-op otherwise).\n#{require_line}\n"
+      end
+
       private
+
+      def require_line
+        %(require_relative "#{gem_name}/the_local")
+      end
 
       def prefix
         options[:prefix] || gem_name
