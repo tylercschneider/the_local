@@ -54,7 +54,8 @@ module TheLocal
         return if File.read(File.join(destination_root, entrypoint)).include?(require_line)
 
         append_to_file entrypoint,
-                       "\n# Register #{gem_name}'s locals when the_local is available (no-op otherwise).\n#{require_line}\n"
+                       "\n# Register #{gem_name}'s locals when the_local is present (no-op otherwise).\n" \
+                       "#{require_line}\n"
       end
 
       private
