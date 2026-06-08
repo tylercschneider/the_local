@@ -19,12 +19,6 @@ module TheLocal
         say "the_local: installed locals for #{allowed.join(", ")}", :green
       end
 
-      def wire_bin_setup
-        return unless SetupHook.apply(File.join(destination_root, "bin/setup"))
-
-        say "the_local: wired refresh into bin/setup", :green
-      end
-
       private
 
       def direct_dependencies
