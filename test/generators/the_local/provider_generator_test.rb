@@ -30,6 +30,14 @@ module TheLocal
           assert_path_exists File.join(dir, "lib/demo/the_local.rb")
         end
       end
+
+      def test_scaffolds_the_reference_loader
+        Dir.mktmpdir do |dir|
+          run_generator_into(dir)
+
+          assert_path_exists File.join(dir, "lib/demo/reference.rb")
+        end
+      end
     end
   end
 end

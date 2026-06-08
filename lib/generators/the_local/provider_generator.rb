@@ -24,6 +24,10 @@ module TheLocal
       class_option :worker, type: :string, default: "develop",
                    desc: "Name of the domain worker facet (develop for libraries, operate for CLIs)"
 
+      def create_reference
+        template "reference.rb.tt", "lib/#{gem_name}/reference.rb"
+      end
+
       def create_companion
         template "the_local.rb.tt", "lib/#{gem_name}/the_local.rb"
       end
