@@ -21,6 +21,12 @@ module TheLocal
       end
     end
 
+    def test_block_names_the_standalone_rules_file
+      Dir.mktmpdir do |dir|
+        assert_includes writer(dir).block, ProcessDocWriter::RULES_FILENAME
+      end
+    end
+
     def test_call_writes_the_standalone_rules_file
       Dir.mktmpdir do |dir|
         writer(dir).call

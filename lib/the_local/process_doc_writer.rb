@@ -27,6 +27,9 @@ module TheLocal
     def block
       <<~MARKDOWN.chomp
         #{BEGIN_MARKER}
+        Read and follow this develop process for all work in this project. It is
+        also written verbatim to `#{RULES_FILENAME}` — reference that file directly.
+
         #{ProcessRules.content}
         #{END_MARKER}
       MARKDOWN
