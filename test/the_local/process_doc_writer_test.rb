@@ -21,6 +21,15 @@ module TheLocal
       end
     end
 
+    def test_call_writes_the_standalone_rules_file
+      Dir.mktmpdir do |dir|
+        writer(dir).call
+
+        assert_equal "#{ProcessRules.content}\n",
+                     File.read(File.join(dir, ProcessDocWriter::RULES_FILENAME))
+      end
+    end
+
     def test_call_creates_claude_md_with_the_block_when_absent
       Dir.mktmpdir do |dir|
         writer(dir).call

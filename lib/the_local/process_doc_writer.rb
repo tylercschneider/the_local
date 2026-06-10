@@ -10,6 +10,7 @@ module TheLocal
   class ProcessDocWriter
     BEGIN_MARKER = "<!-- the_local:process:begin -->"
     END_MARKER = "<!-- the_local:process:end -->"
+    RULES_FILENAME = "develop_process_rules.md"
 
     def initialize(destination:, filename: "CLAUDE.md")
       @destination = destination
@@ -17,6 +18,7 @@ module TheLocal
     end
 
     def call
+      File.write(File.join(@destination, RULES_FILENAME), "#{ProcessRules.content}\n")
       path = File.join(@destination, @filename)
       existing = File.exist?(path) ? File.read(path) : ""
       File.write(path, "#{merge(existing)}\n")
