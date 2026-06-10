@@ -28,11 +28,15 @@ app's own) into `.claude/agents/`, and write the delegation trigger:
 bin/rails g the_local:install
 ```
 
-Re-run `the_local:refresh` (rake) after a `bundle install`/`update` to re-sync.
+Install **copies each provider's committed `.md` verbatim** — the rendering
+happens in the provider gem at build time, not in the host — so every app on the
+same gem version gets a byte-identical local. Re-run `the_local:refresh` (rake)
+after a `bundle install`/`update` to re-sync.
 
 **Provider gem** — contribute the locals an app installs. A gem registers its
 agents with `TheLocal.register` behind a soft guard, exposing the common command
-interface (`info` / `install` / worker). Scaffold it with:
+interface (`info` / `install` / worker), then renders them to committed `.md`
+with `rake the_local:build`. Scaffold it with:
 
 ```bash
 bin/rails g the_local:provider <gem_name> --scope "the gem's domain"
