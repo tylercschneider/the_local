@@ -10,7 +10,8 @@ module <%= module_name %>
   # is a no-op when the_local is absent.
   module Companion
     def self.register!
-      TheLocal.register("<%= gem_name %>"<%= ", prefix: \"#{prefix}\"" unless prefix == gem_name %>, scope: "<%= scope %>") do |c|
+      TheLocal.register("<%= gem_name %>"<%= ", prefix: \"#{prefix}\"" unless prefix == gem_name %>, scope: "<%= scope %>",
+                        agents_dir: File.expand_path("the_local/agents", __dir__)) do |c|
         c.agent "info",
           description: "Use to learn what <%= gem_name %> offers — its API and conventions.",
           tools: "Read",

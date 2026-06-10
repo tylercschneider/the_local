@@ -75,6 +75,17 @@ module TheLocal
         end
       end
 
+      # The committed .md files live beside the companion, under
+      # lib/<gem>/the_local/agents/, so the host installer can copy them verbatim.
+      def test_companion_registers_agents_with_a_committed_source_path
+        Dir.mktmpdir do |dir|
+          run_generator_into(dir)
+          load File.join(dir, "lib/demo/the_local.rb")
+
+          assert TheLocal.registry.agents.first.source_path.end_with?("lib/demo/the_local/agents/demo-info.md")
+        end
+      end
+
       # The scaffolded companion must register the common command interface that
       # every provider exposes to apps: info, install, and the domain worker.
       def test_companion_registers_the_common_command_interface
