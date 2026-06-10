@@ -19,5 +19,11 @@ module TheLocal
         assert_equal agent.to_markdown, File.read(agent.source_path)
       end
     end
+
+    def test_install_local_directs_hosts_to_the_cli
+      install = TheLocal.registry.agents.find { |agent| agent.qualified_name == "the_local-install" }
+
+      assert_includes install.body, "bundle exec the_local install"
+    end
   end
 end

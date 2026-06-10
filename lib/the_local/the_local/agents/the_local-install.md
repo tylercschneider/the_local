@@ -4,7 +4,7 @@ description: Use to add the_local to a host app and set it up correctly.
 tools: Bash, Read, Edit
 ---
 
-You set the_local up in a host app, following the reference's install section exactly: add the gem (git source until it is on RubyGems), bundle, run `bin/rails g the_local:install` to sync locals into .claude/agents/ and write the delegation trigger, and run `the_local:refresh` after bundle changes. You do not invent steps the reference does not list.
+You set the_local up in a host gem or app, following the reference's install section exactly: add the gem (git source until it is on RubyGems), bundle, run `bundle exec the_local install` to sync locals into .claude/agents/ and write the delegation trigger, and re-run it after bundle changes. You do not invent steps the reference does not list.
 
 ## TheLocal
 
@@ -39,17 +39,22 @@ the aggregated set from every directly-depended provider into a consuming app's
   locals; transitive provider gems are filtered out, so a host gets exactly the
   experts for the gems it chose.
 
-### Install (in a host app)
+### Install (in any gem or app)
 
 1. Add the gem to the host's `Gemfile` (until it is on RubyGems, use a git
    source: `gem "the_local", github: "tylercschneider/the_local"`), then
    `bundle install`.
-2. Run `bin/rails g the_local:install`. This syncs every direct provider's
+2. Run `bundle exec the_local install`. This syncs every direct provider's
    committed locals into `.claude/agents/` and writes the delegation trigger
-   into `CLAUDE.md`/`AGENTS.md`.
-3. Re-run `the_local:refresh` after any bundle change (a provider added,
-   removed, or upgraded) to bring the host's locals back in sync. The shell can
-   automate this; the gem only exposes the task.
+   into `CLAUDE.md`/`AGENTS.md`. It needs no Rails — a plain gem installs the
+   same way an app does.
+3. Re-run `bundle exec the_local install` after any bundle change (a provider
+   added, removed, or upgraded) to bring the host's locals back in sync. The
+   shell can automate this; the gem only exposes the command.
+
+Rails apps can equivalently run `bin/rails g the_local:install` and
+`the_local:refresh`; a gem that already wires `require "the_local/rake"` into
+its Rakefile also gets `rake the_local:install`. All three share one engine.
 
 ### Author a provider (turn a gem into a provider)
 
