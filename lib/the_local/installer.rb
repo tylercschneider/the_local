@@ -3,10 +3,9 @@
 require "fileutils"
 
 module TheLocal
-  # Writes the registry's agents into a destination's .claude/agents/ directory,
-  # filtered to the host's allowed gems (its direct dependencies plus itself).
-  # Plain Ruby — no Rails — so the install logic is fully testable; the Rails
-  # generator is a thin wrapper over this.
+  # Copies each allowed provider's committed agent file into a destination's
+  # .claude/agents/ directory, verbatim. Plain Ruby so the Rails generator is a
+  # thin wrapper over it.
   class Installer
     AGENTS_DIR = ".claude/agents"
 
@@ -21,7 +20,8 @@ module TheLocal
       FileUtils.mkdir_p(agents_dir)
 
       installed_agents.each do |agent|
-        File.write(File.join(agents_dir, agent.filename), agent.to_markdown)
+        ensure_committed!(agent)
+        FileUtils.cp(agent.source_path, File.join(agents_dir, agent.filename))
       end
     end
 
@@ -29,6 +29,13 @@ module TheLocal
 
     def installed_agents
       @registry.agents.select { |agent| @allowed_gems.include?(agent.gem_name) }
+    end
+
+    def ensure_committed!(agent)
+      return if agent.source_path && File.exist?(agent.source_path)
+
+      raise Error, "the_local: #{agent.gem_name} registered #{agent.qualified_name} without a committed " \
+                   "agent file. Run `rake the_local:build` in #{agent.gem_name} and commit its the_local/agents/."
     end
   end
 end
