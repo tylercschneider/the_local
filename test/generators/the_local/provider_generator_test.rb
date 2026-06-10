@@ -75,6 +75,15 @@ module TheLocal
         end
       end
 
+      def test_hooks_the_build_task_into_the_rakefile
+        Dir.mktmpdir do |dir|
+          File.write(File.join(dir, "Rakefile"), "# frozen_string_literal: true\n")
+          run_generator_into(dir)
+
+          assert_includes File.read(File.join(dir, "Rakefile")), %(require "the_local/rake")
+        end
+      end
+
       # The committed .md files live beside the companion, under
       # lib/<gem>/the_local/agents/, so the host installer can copy them verbatim.
       def test_companion_registers_agents_with_a_committed_source_path

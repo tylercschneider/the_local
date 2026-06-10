@@ -15,6 +15,7 @@ module TheLocal
       source_root File.expand_path("templates", __dir__)
 
       GEMFILE_LINE = %(gem "the_local", github: "tylercschneider/the_local")
+      RAKEFILE_REQUIRE = %(require "the_local/rake")
 
       desc "Scaffold the_local provider wiring (info/install/worker locals) into this gem"
 
@@ -56,6 +57,15 @@ module TheLocal
         append_to_file entrypoint,
                        "\n# Register #{gem_name}'s locals when the_local is present (no-op otherwise).\n" \
                        "#{require_line}\n"
+      end
+
+      def hook_build_task_into_rakefile
+        return unless File.exist?(File.join(destination_root, "Rakefile"))
+        return if File.read(File.join(destination_root, "Rakefile")).include?(RAKEFILE_REQUIRE)
+
+        append_to_file "Rakefile",
+                       "\n# Render #{gem_name}'s committed the_local agent files: `rake the_local:build`.\n" \
+                       "require \"#{gem_name}\"\n#{RAKEFILE_REQUIRE}\n"
       end
 
       private
