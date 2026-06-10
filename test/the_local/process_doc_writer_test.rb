@@ -15,5 +15,13 @@ module TheLocal
         assert_includes writer(dir).block, "one-time exception"
       end
     end
+
+    def test_call_creates_claude_md_with_the_block_when_absent
+      Dir.mktmpdir do |dir|
+        writer(dir).call
+
+        assert_equal "#{writer(dir).block}\n", File.read(File.join(dir, "CLAUDE.md"))
+      end
+    end
   end
 end

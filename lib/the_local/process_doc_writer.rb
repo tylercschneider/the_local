@@ -16,12 +16,28 @@ module TheLocal
       @filename = filename
     end
 
+    def call
+      path = File.join(@destination, @filename)
+      existing = File.exist?(path) ? File.read(path) : ""
+      File.write(path, "#{merge(existing)}\n")
+    end
+
     def block
       <<~MARKDOWN.chomp
         #{BEGIN_MARKER}
         #{ProcessRules.content}
         #{END_MARKER}
       MARKDOWN
+    end
+
+    private
+
+    def merge(existing)
+      section = /#{Regexp.escape(BEGIN_MARKER)}.*?#{Regexp.escape(END_MARKER)}/m
+      return existing.sub(section, block) if existing.match?(section)
+      return block if existing.strip.empty?
+
+      "#{existing.chomp}\n\n#{block}"
     end
   end
 end
