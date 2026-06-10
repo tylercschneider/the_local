@@ -10,8 +10,6 @@ module TheLocal
       TheLocal.reset!
     end
 
-    # Register a provider whose committed agent files live in gem_dir and build
-    # them — the shape a real provider ships for the installer to copy.
     def build_keystone(agents_dir:, names: %w[scaffold])
       TheLocal.register("keystone_ui", prefix: "keystone", agents_dir: agents_dir) do |c|
         names.each do |name|
@@ -26,9 +24,6 @@ module TheLocal
       Installer.new(registry: TheLocal.registry, destination: dir, allowed_gems: allowed_gems).call
     end
 
-    # The committed file is the source of truth: the installer copies its bytes,
-    # it does not re-render from the registration. Hand-editing the committed
-    # file proves the copy — a renderer would overwrite this with to_markdown.
     def test_copies_the_committed_agent_file_verbatim
       Dir.mktmpdir do |gem_dir|
         build_keystone(agents_dir: gem_dir)
@@ -52,6 +47,18 @@ module TheLocal
 
           refute_path_exists File.join(dir, ".claude/agents/some_transitive_gem-helper.md")
         end
+      end
+    end
+
+    def test_raises_an_actionable_error_when_an_allowed_agent_has_no_committed_file
+      TheLocal.register("keystone_ui", prefix: "keystone") do |c|
+        c.agent "scaffold", description: "…", tools: "Read", body: "…"
+      end
+
+      Dir.mktmpdir do |dir|
+        error = assert_raises(TheLocal::Error) { install_into(dir) }
+
+        assert_match(/keystone-scaffold/, error.message)
       end
     end
 
