@@ -10,10 +10,18 @@ module TheLocal
     end
 
     def call
-      usage
+      case @argv.first
+      when "install" then install
+      else usage
+      end
     end
 
     private
+
+    def install
+      allowed = Refresh.call(destination: Dir.pwd)
+      @out.puts "the_local: installed locals for #{allowed.join(", ")}"
+    end
 
     def usage
       @out.puts "Usage: the_local install"

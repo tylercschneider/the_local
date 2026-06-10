@@ -2,6 +2,7 @@
 
 require "test_helper"
 require "the_local/cli"
+require "minitest/mock"
 require "stringio"
 
 module TheLocal
@@ -11,6 +12,15 @@ module TheLocal
       CLI.new([], out: out).call
 
       assert_includes out.string, "Usage: the_local install"
+    end
+
+    def test_install_reports_the_synced_gems
+      out = StringIO.new
+      Refresh.stub(:call, %w[keystone_ui event_engine]) do
+        CLI.new(["install"], out: out).call
+      end
+
+      assert_includes out.string, "installed locals for keystone_ui, event_engine"
     end
   end
 end
