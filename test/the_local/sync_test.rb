@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "the_local/builder"
 require "tmpdir"
 
 module TheLocal
@@ -9,10 +10,13 @@ module TheLocal
       TheLocal.reset!
     end
 
-    def register_keystone
-      TheLocal.register("keystone_ui", prefix: "keystone", scope: "UI work") do |c|
+    # Register a provider whose committed agent files live in gem_dir, then build
+    # them — the shape a real provider ships, so the installer has files to copy.
+    def register_keystone(agents_dir:)
+      TheLocal.register("keystone_ui", prefix: "keystone", scope: "UI work", agents_dir: agents_dir) do |c|
         c.agent "develop", description: "Build UI.", tools: "Read, Write, Edit", body: "…", knowledge: "API."
       end
+      Builder.new(registry: TheLocal.registry).call
     end
 
     def sync_into(dir, direct: ["keystone_ui"], bundled: ["keystone_ui"])
@@ -21,13 +25,15 @@ module TheLocal
     end
 
     def test_writes_agents_and_the_trigger_for_allowed_gems
-      register_keystone
+      Dir.mktmpdir do |gem_dir|
+        register_keystone(agents_dir: gem_dir)
 
-      Dir.mktmpdir do |dir|
-        sync_into(dir)
+        Dir.mktmpdir do |dir|
+          sync_into(dir)
 
-        assert_path_exists File.join(dir, ".claude/agents/keystone-develop.md")
-        assert_path_exists File.join(dir, "CLAUDE.md")
+          assert_path_exists File.join(dir, ".claude/agents/keystone-develop.md")
+          assert_path_exists File.join(dir, "CLAUDE.md")
+        end
       end
     end
   end
