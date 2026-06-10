@@ -61,11 +61,7 @@ GEM
     loofah (2.25.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    mini_portile2 (2.8.9)
     minitest (5.27.0)
-    nokogiri (1.19.3)
-      mini_portile2 (~> 2.8.2)
-      racc (~> 1.4)
     nokogiri (1.19.3-arm64-darwin)
       racc (~> 1.4)
     nokogiri (1.19.3-x86_64-linux-gnu)
@@ -129,6 +125,13 @@ GEM
     rubocop-ast (1.49.1)
       parser (>= 3.3.7.2)
       prism (~> 1.7)
+    rubocop-minitest (0.39.1)
+      lint_roller (~> 1.1)
+      rubocop (>= 1.75.0, < 2.0)
+      rubocop-ast (>= 1.38.0, < 2.0)
+    rubocop-rake (0.7.1)
+      lint_roller (~> 1.1)
+      rubocop (>= 1.72.1)
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
     stringio (3.2.0)
@@ -145,7 +148,6 @@ GEM
 
 PLATFORMS
   arm64-darwin-25
-  ruby
   x86_64-linux
 
 DEPENDENCIES
@@ -154,6 +156,8 @@ DEPENDENCIES
   railties (>= 7.0)
   rake (~> 13.0)
   rubocop (~> 1.21)
+  rubocop-minitest
+  rubocop-rake
   the_local!
 
 BUNDLED WITH

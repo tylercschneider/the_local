@@ -10,7 +10,7 @@ module TheLocal
         description: "Use PROACTIVELY for UI work.",
         tools: "Read, Write, Edit", body: "You build UI.", knowledge: "API docs."
       }
-      Agent.new(**defaults.merge(overrides))
+      Agent.new(**defaults, **overrides)
     end
 
     def test_filename_namespaces_the_agent_under_its_prefix

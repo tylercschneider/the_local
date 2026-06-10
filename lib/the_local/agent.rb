@@ -13,7 +13,7 @@ module TheLocal
   # provider supplies an agents_dir, so existing providers keep working.
   Agent = Data.define(:gem_name, :prefix, :name, :description, :tools, :body, :knowledge, :source_path) do
     def initialize(source_path: nil, **args)
-      super(source_path: source_path, **args)
+      super
     end
 
     def qualified_name
