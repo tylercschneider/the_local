@@ -29,11 +29,11 @@ module TheLocal
         c.agent "install",
                 description: "Use to add the_local to a host app and set it up correctly.",
                 tools: "Bash, Read, Edit",
-                body: "You set the_local up in a host app, following the reference's install section " \
-                      "exactly: add the gem (git source until it is on RubyGems), bundle, run " \
-                      "`bin/rails g the_local:install` to sync locals into .claude/agents/ and write " \
-                      "the delegation trigger, and run `the_local:refresh` after bundle changes. You " \
-                      "do not invent steps the reference does not list.",
+                body: "You set the_local up in a host gem or app, following the reference's install " \
+                      "section exactly: add the gem (git source until it is on RubyGems), bundle, run " \
+                      "`bundle exec the_local install` to sync locals into .claude/agents/ and write " \
+                      "the delegation trigger, and re-run it after bundle changes. You do not invent " \
+                      "steps the reference does not list.",
                 knowledge: TheLocal::Reference.content
 
         c.agent "develop",
