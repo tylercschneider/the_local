@@ -34,5 +34,17 @@ module TheLocal
         end
       end
     end
+
+    def test_writes_the_develop_process_rules_into_claude_md
+      Dir.mktmpdir do |gem_dir|
+        register_keystone(agents_dir: gem_dir)
+
+        Dir.mktmpdir do |dir|
+          sync_into(dir)
+
+          assert_includes File.read(File.join(dir, "CLAUDE.md")), ProcessDocWriter::BEGIN_MARKER
+        end
+      end
+    end
   end
 end
