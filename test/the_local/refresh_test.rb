@@ -17,12 +17,16 @@ module TheLocal
       FakeDefinition.new(direct.map { |n| Dep.new(n) }, bundled.map { |n| Dep.new(n) })
     end
 
+    def register_keystone(agents_dir:)
+      TheLocal.register("keystone_ui", prefix: "keystone", scope: "UI work", agents_dir: agents_dir) do |c|
+        c.agent "develop", description: "Build UI.", tools: "Read, Write, Edit", body: "…", knowledge: "API."
+      end
+      Builder.new(registry: TheLocal.registry).call
+    end
+
     def test_call_reads_the_definition_and_syncs_to_the_destination
       Dir.mktmpdir do |gem_dir|
-        TheLocal.register("keystone_ui", prefix: "keystone", scope: "UI work", agents_dir: gem_dir) do |c|
-          c.agent "develop", description: "Build UI.", tools: "Read, Write, Edit", body: "…", knowledge: "API."
-        end
-        Builder.new(registry: TheLocal.registry).call
+        register_keystone(agents_dir: gem_dir)
 
         Dir.mktmpdir do |dir|
           Refresh.call(destination: dir, definition: definition(direct: ["keystone_ui"], bundled: ["keystone_ui"]))

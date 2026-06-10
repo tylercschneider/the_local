@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "the_local/builder"
 require "tmpdir"
 require "rails/generators"
 require "generators/the_local/install_generator"
@@ -10,6 +11,15 @@ module TheLocal
     class InstallGeneratorTest < Minitest::Test
       def setup
         TheLocal.reset!
+      end
+
+      # Register a provider with committed agent files in gem_dir, as a real
+      # provider ships them, so the generator has files to install.
+      def register_keystone(agents_dir:)
+        TheLocal.register("keystone_ui", prefix: "keystone", scope: "UI work", agents_dir: agents_dir) do |c|
+          c.agent "scaffold", description: "…", tools: "Read", body: "…"
+        end
+        Builder.new(registry: TheLocal.registry).call
       end
 
       def run_generator_into(dir, direct:, bundled:)
@@ -25,15 +35,15 @@ module TheLocal
       # (stubbing the Bundler data), and confirm it both installs the agent file
       # and writes the delegation trigger into the destination.
       def test_installs_allowed_locals_and_writes_the_delegation_trigger
-        TheLocal.register("keystone_ui", prefix: "keystone", scope: "UI work") do |c|
-          c.agent "scaffold", description: "…", tools: "Read", body: "…"
-        end
+        Dir.mktmpdir do |gem_dir|
+          register_keystone(agents_dir: gem_dir)
 
-        Dir.mktmpdir do |dir|
-          run_generator_into(dir, direct: ["keystone_ui"], bundled: ["keystone_ui"])
+          Dir.mktmpdir do |dir|
+            run_generator_into(dir, direct: ["keystone_ui"], bundled: ["keystone_ui"])
 
-          assert_path_exists File.join(dir, ".claude/agents/keystone-scaffold.md")
-          assert_path_exists File.join(dir, "CLAUDE.md")
+            assert_path_exists File.join(dir, ".claude/agents/keystone-scaffold.md")
+            assert_path_exists File.join(dir, "CLAUDE.md")
+          end
         end
       end
     end
