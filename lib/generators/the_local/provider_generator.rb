@@ -41,6 +41,8 @@ module TheLocal
       end
 
       def add_to_gemfile
+        return if gem_name == "the_local"
+
         gemfile = File.join(destination_root, "Gemfile")
         return unless File.exist?(gemfile)
         return if File.read(gemfile).include?(GEMFILE_LINE)

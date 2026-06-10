@@ -45,3 +45,5 @@ end
 # In a Rails host, expose the the_local:refresh rake task. Skipped outside Rails
 # so the gem core stays Rails-free.
 require_relative "the_local/railtie" if defined?(Rails::Railtie)
+
+require_relative "the_local/the_local"
