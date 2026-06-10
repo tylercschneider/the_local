@@ -1,0 +1,90 @@
+## TheLocal
+
+> **DO NOT** explore the the_local gem source code. This reference is the
+> complete user-facing API, embedded verbatim into every the_local local so
+> their guidance never drifts. Keep it the single source of truth.
+
+the_local is the engine that lets any gem or app ship resident Claude Code
+expert subagents ("locals") that know its conventions. A provider gem registers
+its locals once; the_local renders them to committed `.md` files and installs
+the aggregated set from every directly-depended provider into a consuming app's
+`.claude/agents/`, plus a delegation rule so the host's agent actually uses them.
+
+### The model
+
+- **Providers register locals.** A gem (or the app) calls `TheLocal.register`
+  at load time, behind a soft `require "the_local"` guard so it works
+  standalone. Each `c.agent` becomes one local.
+- **`the_local:build` renders committed `.md`.** The provider runs
+  `rake the_local:build`; `TheLocal::Builder` writes each agent to its
+  `source_path` under `lib/<gem>/the_local/agents/<prefix>-<name>.md`. The
+  rendered files are committed to the provider's repo — they are the artifact,
+  the register block + `guide.md` are the source of truth.
+- **`the_local:install` / `the_local:refresh` copy verbatim.** In a host app the
+  installer copies each provider's committed `.md` into `.claude/agents/`
+  byte-for-byte (no host-side rendering), so output depends only on the provider
+  gem version — a true carbon copy across every app.
+- **The delegation trigger.** Install also writes a registry-generated block into
+  the host's `CLAUDE.md`/`AGENTS.md` telling the host agent to delegate to these
+  locals. This is what makes delegation actually happen.
+- **Direct-dependency scope.** Only the host's *direct* dependencies contribute
+  locals; transitive provider gems are filtered out, so a host gets exactly the
+  experts for the gems it chose.
+
+### Install (in a host app)
+
+1. Add the gem to the host's `Gemfile` (until it is on RubyGems, use a git
+   source: `gem "the_local", github: "tylercschneider/the_local"`), then
+   `bundle install`.
+2. Run `bin/rails g the_local:install`. This syncs every direct provider's
+   committed locals into `.claude/agents/` and writes the delegation trigger
+   into `CLAUDE.md`/`AGENTS.md`.
+3. Re-run `the_local:refresh` after any bundle change (a provider added,
+   removed, or upgraded) to bring the host's locals back in sync. The shell can
+   automate this; the gem only exposes the task.
+
+### Author a provider (turn a gem into a provider)
+
+1. Run `bin/rails g the_local:provider <gem_name>` (pass `--scope`,
+   `--prefix`, `--worker` as needed). It scaffolds `lib/<gem>/reference.rb`, a
+   `lib/<gem>/reference/guide.md`, and a `lib/<gem>/the_local.rb` companion that
+   registers the standard interface; hooks `the_local:build` into the `Rakefile`;
+   requires the companion from the gem entrypoint; and builds the committed
+   `.md` for review.
+2. Write `guide.md` in this format — it is the single source of truth and is
+   embedded verbatim into every local. Document *your own* gem only: what it
+   does, how to install it, the conventions to enforce. Name companion gems but
+   do not explain their internals.
+3. Tailor the register block bodies and `scope` to your gem; the standard
+   interface is `info` (read-only explainer), `install` (sets the gem up in a
+   host), and a domain worker (`develop` for libraries, `operate` for CLIs).
+4. Run `rake the_local:build` and commit `lib/<gem>/the_local/agents/*.md`
+   alongside the code. A drift test asserting each committed file equals its
+   `agent.to_markdown` keeps the artifact honest.
+
+### TheLocal.register
+
+```ruby
+TheLocal.register("my_gem", prefix: "my_gem", scope: "one-line domain phrase",
+                  agents_dir: File.expand_path("the_local/agents", __dir__)) do |c|
+  c.agent "info",
+    description: "Use to learn what my_gem offers.",
+    tools: "Read",
+    body: "You explain my_gem, answering only from the reference. You make no changes.",
+    knowledge: MyGem::Reference.content
+end
+```
+
+- `gem_name` (first arg) filters to a host's direct dependencies.
+- `prefix` is the agent filename namespace; defaults to the gem name.
+- `scope` is a one-line domain phrase used to generate the delegation trigger.
+- `agents_dir` is the absolute path to the committed `.md` files; each agent
+  records its `source_path` there so the installer can copy it verbatim.
+
+### Conventions
+
+- The register block lives behind `begin require "the_local" … rescue LoadError`
+  so the gem still works when the_local is absent.
+- `guide.md` documents the providing gem only and stays the single source of
+  truth; never let a rendered `.md` drift from `agent.to_markdown`.
+- Commit the rendered `.md`; never render in the host at install time.
