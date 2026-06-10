@@ -12,5 +12,13 @@ module TheLocal
 
       assert app.lookup("the_local:build")
     end
+
+    def test_defines_the_install_rake_task
+      app = Rake::Application.new
+      Rake.application = app
+      load File.expand_path("../../lib/the_local/rake.rb", __dir__)
+
+      assert app.lookup("the_local:install")
+    end
   end
 end

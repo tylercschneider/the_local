@@ -14,4 +14,10 @@ namespace :the_local do
     written = TheLocal::Builder.new(registry: TheLocal.registry).call
     puts "the_local: built #{written.length} agent file(s)"
   end
+
+  desc "Install/refresh this project's locals from the current bundle into .claude/agents/"
+  task :install do
+    allowed = TheLocal::Refresh.call(destination: Dir.pwd)
+    puts "the_local: installed locals for #{allowed.join(", ")}"
+  end
 end
