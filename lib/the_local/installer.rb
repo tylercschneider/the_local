@@ -3,10 +3,12 @@
 require "fileutils"
 
 module TheLocal
-  # Writes the registry's agents into a destination's .claude/agents/ directory,
-  # filtered to the host's allowed gems (its direct dependencies plus itself).
-  # Plain Ruby — no Rails — so the install logic is fully testable; the Rails
-  # generator is a thin wrapper over this.
+  # Copies each allowed provider's committed agent file into a destination's
+  # .claude/agents/ directory, verbatim — the gem renders and commits the file
+  # (via the_local:build), the host installs the exact bytes rather than
+  # re-rendering. Filtered to the host's allowed gems (its direct dependencies
+  # plus itself). Plain Ruby — no Rails — so the install logic is fully testable;
+  # the Rails generator is a thin wrapper over this.
   class Installer
     AGENTS_DIR = ".claude/agents"
 
@@ -21,7 +23,7 @@ module TheLocal
       FileUtils.mkdir_p(agents_dir)
 
       installed_agents.each do |agent|
-        File.write(File.join(agents_dir, agent.filename), agent.to_markdown)
+        FileUtils.cp(agent.source_path, File.join(agents_dir, agent.filename))
       end
     end
 
