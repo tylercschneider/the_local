@@ -56,6 +56,16 @@ module TheLocal
         end
       end
 
+      def test_does_not_add_a_self_reference_when_the_local_provisions_itself
+        Dir.mktmpdir do |dir|
+          File.write(File.join(dir, "Gemfile"), "source \"https://rubygems.org\"\ngemspec\n")
+          generator = ProviderGenerator.new(["the_local"], {}, destination_root: dir)
+          capture_io { generator.add_to_gemfile }
+
+          refute_includes File.read(File.join(dir, "Gemfile")), ProviderGenerator::GEMFILE_LINE
+        end
+      end
+
       def test_gemfile_injection_is_idempotent_on_rerun
         Dir.mktmpdir do |dir|
           run_generator_into(dir)
