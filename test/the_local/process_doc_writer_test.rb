@@ -23,5 +23,14 @@ module TheLocal
         assert_equal "#{writer(dir).block}\n", File.read(File.join(dir, "CLAUDE.md"))
       end
     end
+
+    def test_call_is_idempotent_across_reruns
+      Dir.mktmpdir do |dir|
+        writer(dir).call
+        writer(dir).call
+
+        assert_equal 1, File.read(File.join(dir, "CLAUDE.md")).scan(ProcessDocWriter::BEGIN_MARKER).size
+      end
+    end
   end
 end
