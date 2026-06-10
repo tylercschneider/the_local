@@ -46,6 +46,22 @@ module TheLocal
       assert_includes TheLocal.registry.agents.first.to_markdown, "API docs."
     end
 
+    def test_collector_derives_source_path_from_its_agents_dir
+      collector = Collector.new("keystone_ui", "keystone", TheLocal.registry,
+                                agents_dir: "/gems/keystone/the_local/agents")
+      collector.agent "scaffold", description: "…", tools: "Read", body: "…"
+
+      assert_equal "/gems/keystone/the_local/agents/keystone-scaffold.md",
+                   TheLocal.registry.agents.first.source_path
+    end
+
+    def test_collector_leaves_source_path_nil_without_an_agents_dir
+      collector = Collector.new("keystone_ui", "keystone", TheLocal.registry)
+      collector.agent "scaffold", description: "…", tools: "Read", body: "…"
+
+      assert_nil TheLocal.registry.agents.first.source_path
+    end
+
     def test_register_records_the_provider_with_its_scope
       TheLocal.register("keystone_ui", prefix: "keystone", scope: "UI — pages, forms, tables") do |c|
         c.agent "scaffold", description: "…", tools: "Read", body: "…"
