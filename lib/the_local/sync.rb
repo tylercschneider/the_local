@@ -21,6 +21,7 @@ module TheLocal
       )
       Installer.new(registry: @registry, destination: @destination, allowed_gems: allowed).call
       TriggerWriter.new(registry: @registry, destination: @destination, allowed_gems: allowed).call
+      ProcessDocWriter.new(destination: @destination).call
       allowed
     end
   end
