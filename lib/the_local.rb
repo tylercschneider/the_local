@@ -23,14 +23,17 @@ module TheLocal
     # agents. The first argument is the providing gem's name (used to filter to a
     # host's direct dependencies); +prefix+ is the agent filename namespace and
     # defaults to the gem name; +scope+ is a one-line phrase describing the
-    # provider's domain, used to generate the delegation trigger:
+    # provider's domain, used to generate the delegation trigger. +agents_dir+
+    # is the absolute path to the provider's committed, pre-rendered .md files
+    # (e.g. File.expand_path("the_local/agents", __dir__)); when given, each
+    # agent records its source_path there for the host installer to copy:
     #
     #   TheLocal.register("keystone_ui", prefix: "keystone", scope: "UI work") do |c|
     #     c.agent "scaffold", description: "…", tools: "…", body: "…", knowledge: "…"
     #   end
-    def register(gem_name, prefix: gem_name, scope: nil)
+    def register(gem_name, prefix: gem_name, scope: nil, agents_dir: nil)
       registry.add_provider(Provider.new(gem_name: gem_name, prefix: prefix, scope: scope))
-      yield Collector.new(gem_name, prefix, registry)
+      yield Collector.new(gem_name, prefix, registry, agents_dir: agents_dir)
     end
 
     def reset!

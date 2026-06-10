@@ -21,6 +21,16 @@ module TheLocal
       assert_equal "keystone_ui", build.gem_name
     end
 
+    def test_source_path_defaults_to_nil_until_a_provider_supplies_one
+      assert_nil build.source_path
+    end
+
+    def test_source_path_carries_the_committed_files_location
+      path = "/gems/keystone/the_local/agents/keystone-scaffold.md"
+
+      assert_equal path, build(source_path: path).source_path
+    end
+
     def test_to_markdown_opens_with_yaml_frontmatter
       assert build.to_markdown.start_with?(<<~FRONTMATTER)
         ---

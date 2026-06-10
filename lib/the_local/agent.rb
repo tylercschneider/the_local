@@ -8,7 +8,14 @@ module TheLocal
   # dependencies). +prefix+ is the filename namespace (often a shorter alias,
   # e.g. gem "keystone_ui" → prefix "keystone"). +knowledge+ is a string or
   # array of strings appended below the role body — the provider's reference(s).
-  Agent = Data.define(:gem_name, :prefix, :name, :description, :tools, :body, :knowledge) do
+  # +source_path+ is the absolute path to the provider's committed, pre-rendered
+  # .md file; the host installer copies it verbatim. It stays nil until a
+  # provider supplies an agents_dir, so existing providers keep working.
+  Agent = Data.define(:gem_name, :prefix, :name, :description, :tools, :body, :knowledge, :source_path) do
+    def initialize(source_path: nil, **args)
+      super(source_path: source_path, **args)
+    end
+
     def qualified_name
       "#{prefix}-#{name}"
     end
