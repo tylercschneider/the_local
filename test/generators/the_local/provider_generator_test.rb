@@ -23,6 +23,16 @@ module TheLocal
         capture_io { ProviderGenerator.start(args, destination_root: dir) }
       end
 
+      # Reloading the same generated companion across tests redefines its
+      # register! method; silence that expected warning while loading.
+      def load_companion(path)
+        previous = $VERBOSE
+        $VERBOSE = nil
+        load path
+      ensure
+        $VERBOSE = previous
+      end
+
       def test_scaffolds_the_companion_registration_file
         Dir.mktmpdir do |dir|
           run_generator_into(dir)
@@ -117,7 +127,7 @@ module TheLocal
         Dir.mktmpdir do |dir|
           run_generator_into(dir)
           TheLocal.reset!
-          load File.join(dir, "lib/demo/the_local.rb")
+          load_companion(File.join(dir, "lib/demo/the_local.rb"))
 
           assert TheLocal.registry.agents.first.source_path.end_with?("lib/demo/the_local/agents/demo-info.md")
         end
@@ -129,7 +139,7 @@ module TheLocal
         Dir.mktmpdir do |dir|
           run_generator_into(dir)
           TheLocal.reset!
-          load File.join(dir, "lib/demo/the_local.rb")
+          load_companion(File.join(dir, "lib/demo/the_local.rb"))
 
           assert_equal %w[info install develop], TheLocal.registry.agents.map(&:name)
         end
