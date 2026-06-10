@@ -11,11 +11,23 @@ consistent instead of drifting.
 
 ## Installation
 
-Until `the_local` is on RubyGems, add it from git:
+Add it to your Gemfile:
+
+```ruby
+gem "the_local"
+```
+
+or install it directly with `gem install the_local`. To track an unreleased
+change, point at the repo instead:
 
 ```ruby
 gem "the_local", github: "tylercschneider/the_local"
 ```
+
+The gem's core is Rails-free, but the primary documented workflow uses the
+`bin/rails g the_local:install` / `the_local:provider` generators, so those steps
+assume a Rails host. The `the_local:refresh` rake task and the register API work
+without Rails.
 
 ## Usage
 
