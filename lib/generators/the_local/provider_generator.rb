@@ -93,8 +93,11 @@ module TheLocal
         options[:prefix] || gem_name
       end
 
+      # Thor renders templates via File.binread, so the ERB buffer is ASCII-8BIT.
+      # A UTF-8 scope would flip the buffer mid-render and then clash with the
+      # template's own non-ASCII literals; match the buffer's encoding to avoid it.
       def scope
-        options[:scope]
+        options[:scope]&.b
       end
 
       def worker

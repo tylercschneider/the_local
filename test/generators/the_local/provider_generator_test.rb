@@ -85,6 +85,15 @@ module TheLocal
         end
       end
 
+      def test_renders_the_companion_with_a_non_ascii_scope
+        Dir.mktmpdir do |dir|
+          run_generator_into(dir, ["demo", "--scope", "UI work — components and recipes"])
+
+          assert_includes File.read(File.join(dir, "lib/demo/the_local.rb")),
+                          %(scope: "UI work — components and recipes")
+        end
+      end
+
       def test_builds_the_committed_agent_files_on_scaffold
         Dir.mktmpdir do |dir|
           run_generator_into(dir)
