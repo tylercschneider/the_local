@@ -50,5 +50,18 @@ module TheLocal
 
       assert_equal %i[default development], required
     end
+
+    def test_call_tolerates_a_bundled_gem_that_fails_to_load
+      Dir.mktmpdir do |dir|
+        crashing = ->(*) { raise NameError, "uninitialized constant Rails" }
+        capture_io do
+          Bundler.stub(:require, crashing) do
+            Refresh.call(destination: dir, definition: definition(direct: [], bundled: [], groups: [:default]))
+          end
+        end
+
+        assert_path_exists File.join(dir, "CLAUDE.md")
+      end
+    end
   end
 end
