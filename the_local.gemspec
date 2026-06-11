@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
                      "that know its conventions, and installs the aggregated set from every " \
                      "installed provider into a consuming app's .claude/agents/ — plus a " \
                      "delegation rule so the app's agent actually uses them."
-  spec.homepage = "https://github.com/tylercschneider/the_local"
+  spec.homepage = "https://github.com/DYB-Development/the_local"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.2.0"
 
