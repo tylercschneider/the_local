@@ -24,6 +24,7 @@ module TheLocal
     def install
       allowed = Refresh.call(destination: Dir.pwd)
       @out.puts "the_local: installed locals for #{allowed.join(", ")}"
+      @out.puts "Restart your Claude Code session to use them — agents load at startup."
     end
 
     def usage

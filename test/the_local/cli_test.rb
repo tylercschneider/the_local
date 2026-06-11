@@ -22,5 +22,14 @@ module TheLocal
 
       assert_includes out.string, "installed locals for keystone_ui, event_engine"
     end
+
+    def test_install_reminds_to_restart_the_session
+      out = StringIO.new
+      Refresh.stub(:call, %w[the_local]) do
+        CLI.new(["install"], out: out).call
+      end
+
+      assert_includes out.string, "Restart your Claude Code session"
+    end
   end
 end
