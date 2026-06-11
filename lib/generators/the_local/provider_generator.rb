@@ -68,7 +68,7 @@ module TheLocal
 
         append_to_file "Rakefile",
                        "\n# Render #{gem_name}'s committed the_local agent files: `rake the_local:build`.\n" \
-                       "require \"#{gem_name}\"\n#{RAKEFILE_REQUIRE}\n"
+                       "require \"#{lib_path}\"\n#{RAKEFILE_REQUIRE}\n"
       end
 
       # Render the committed .md files now, so they land in the diff for review.

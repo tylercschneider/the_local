@@ -172,6 +172,15 @@ module TheLocal
                           %(require_relative "subscribers/the_local")
         end
       end
+
+      def test_hooks_the_build_task_with_the_namespaced_require
+        Dir.mktmpdir do |dir|
+          File.write(File.join(dir, "Rakefile"), "# frozen_string_literal: true\n")
+          run_namespaced_generator_into(dir)
+
+          assert_includes File.read(File.join(dir, "Rakefile")), %(require "event_engine/subscribers")
+        end
+      end
     end
   end
 end
