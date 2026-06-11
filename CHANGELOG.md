@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+- Install instructions and the provider generator now use the published
+  `gem "the_local"` instead of a `github:` git source, since the gem is on
+  RubyGems.
+
 ## [0.1.0] - 2026-06-02
 
 - Initial release.
