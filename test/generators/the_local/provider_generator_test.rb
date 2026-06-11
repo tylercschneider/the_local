@@ -72,7 +72,7 @@ module TheLocal
           run_generator_into(dir)
 
           assert_includes File.read(File.join(dir, "Gemfile")),
-                          %(gem "the_local", github: "tylercschneider/the_local")
+                          %(gem "the_local", github: "DYB-Development/the_local")
         end
       end
 
