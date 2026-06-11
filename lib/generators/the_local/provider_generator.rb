@@ -15,7 +15,7 @@ module TheLocal
     class ProviderGenerator < Rails::Generators::Base
       source_root File.expand_path("templates", __dir__)
 
-      GEMFILE_LINE = %(gem "the_local", github: "DYB-Development/the_local")
+      GEMFILE_LINE = %(gem "the_local")
       RAKEFILE_REQUIRE = %(require "the_local/rake")
 
       desc "Scaffold the_local provider wiring (info/install/worker locals) into this gem"
