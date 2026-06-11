@@ -126,8 +126,8 @@ itself a non-Rails provider built this way — mirror its own wiring
    ```
 4. `require_relative "<gem>/the_local"` from the gem's entrypoint (so your own
    `the_local:build` and standalone use load the register block — a host never
-   needs it), and add `gem "the_local", github: "DYB-Development/the_local"` to
-   the Gemfile (dev/test — an optional companion, not a hard dependency).
+   needs it), and add `gem "the_local"` to the Gemfile (dev/test — an optional
+   companion, not a hard dependency).
 5. Add `require "the_local/rake"` to the `Rakefile`, then build, commit, and
    **ship** the rendered locals — `rake the_local:build && git add
    lib/<gem>/the_local/agents`, and make sure they're in the gemspec's `files`.
