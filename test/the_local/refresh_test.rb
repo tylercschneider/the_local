@@ -3,11 +3,13 @@
 require "test_helper"
 require "the_local/builder"
 require "minitest/mock"
+require "fileutils"
 require "tmpdir"
 
 module TheLocal
   class RefreshTest < Minitest::Test
     Dep = Struct.new(:name)
+    Spec = Struct.new(:name, :full_gem_path)
     FakeDefinition = Struct.new(:dependencies, :specs, :groups)
 
     def setup
@@ -31,7 +33,7 @@ module TheLocal
 
         Dir.mktmpdir do |dir|
           Refresh.call(destination: dir, definition: definition(direct: ["keystone_ui"], bundled: ["keystone_ui"]),
-                       require_bundle: -> {})
+                       load_providers: -> {})
 
           assert_path_exists File.join(dir, ".claude/agents/keystone-develop.md")
           assert_path_exists File.join(dir, "CLAUDE.md")
@@ -39,28 +41,18 @@ module TheLocal
       end
     end
 
-    def test_call_requires_the_bundle_so_unloaded_providers_register
-      required = nil
-      Dir.mktmpdir do |dir|
-        Bundler.stub(:require, ->(*groups) { required = groups }) do
-          definition = definition(direct: [], bundled: [], groups: %i[default development])
-          Refresh.call(destination: dir, definition: definition)
+    def test_call_installs_committed_agents_discovered_on_disk
+      Dir.mktmpdir do |gem_dir|
+        agents = File.join(gem_dir, "lib/widgets/the_local/agents")
+        FileUtils.mkdir_p(agents)
+        File.write(File.join(agents, "widgets-info.md"), "---\nname: widgets-info\ntools: Read\n---\n\nbody\n")
+        definition = FakeDefinition.new([Dep.new("widgets")], [Spec.new("widgets", gem_dir)], [:default])
+
+        Dir.mktmpdir do |host|
+          Refresh.call(destination: host, definition: definition)
+
+          assert_path_exists File.join(host, ".claude/agents/widgets-info.md")
         end
-      end
-
-      assert_equal %i[default development], required
-    end
-
-    def test_call_tolerates_a_bundled_gem_that_fails_to_load
-      Dir.mktmpdir do |dir|
-        crashing = ->(*) { raise NameError, "uninitialized constant Rails" }
-        capture_io do
-          Bundler.stub(:require, crashing) do
-            Refresh.call(destination: dir, definition: definition(direct: [], bundled: [], groups: [:default]))
-          end
-        end
-
-        assert_path_exists File.join(dir, "CLAUDE.md")
       end
     end
   end
