@@ -53,7 +53,7 @@ module TheLocal
       end
 
       def require_from_entrypoint
-        entrypoint = File.join("lib", "#{gem_name}.rb")
+        entrypoint = File.join("lib", "#{lib_path}.rb")
         return unless File.exist?(File.join(destination_root, entrypoint))
         return if File.read(File.join(destination_root, entrypoint)).include?(require_line)
 
@@ -86,7 +86,7 @@ module TheLocal
       private
 
       def require_line
-        %(require_relative "#{gem_name}/the_local")
+        %(require_relative "#{File.basename(lib_path)}/the_local")
       end
 
       def prefix

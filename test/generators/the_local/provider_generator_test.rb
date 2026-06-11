@@ -163,6 +163,15 @@ module TheLocal
                           "module EventEngine\nmodule Subscribers"
         end
       end
+
+      def test_requires_the_companion_from_the_namespaced_entrypoint
+        Dir.mktmpdir do |dir|
+          run_namespaced_generator_into(dir)
+
+          assert_includes File.read(File.join(dir, "lib/event_engine/subscribers.rb")),
+                          %(require_relative "subscribers/the_local")
+        end
+      end
     end
   end
 end
