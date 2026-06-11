@@ -28,6 +28,10 @@ module TheLocal
       class_option :worker, type: :string, default: "develop",
                             desc: "Name of the domain worker facet (develop for libraries, operate for CLIs)"
 
+      def relocate_to_gem_root
+        self.destination_root = gem_root
+      end
+
       def create_reference
         template "reference.rb.tt", "lib/#{lib_path}/reference.rb"
       end
@@ -102,6 +106,22 @@ module TheLocal
 
       def worker
         options[:worker]
+      end
+
+      def gem_root
+        ascend_to_gemspec(destination_root) || destination_root
+      end
+
+      def ascend_to_gemspec(start)
+        dir = File.expand_path(start)
+        loop do
+          return dir if Dir.glob(File.join(dir, "*.gemspec")).any?
+
+          parent = File.dirname(dir)
+          return nil if parent == dir
+
+          dir = parent
+        end
       end
 
       def lib_path

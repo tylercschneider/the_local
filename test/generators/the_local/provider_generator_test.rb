@@ -181,6 +181,23 @@ module TheLocal
           assert_includes File.read(File.join(dir, "Rakefile")), %(require "event_engine/subscribers")
         end
       end
+
+      # An engine can only run the generator from test/dummy, so destination_root
+      # is the dummy app; the generator must relocate to the gem root (the nearest
+      # ancestor with a *.gemspec) before writing.
+      def test_writes_to_the_gem_root_when_run_from_a_dummy_app
+        Dir.mktmpdir do |gem_root|
+          File.write(File.join(gem_root, "demo.gemspec"), "# dummy gemspec\n")
+          File.write(File.join(gem_root, "Gemfile"), "source \"https://rubygems.org\"\ngemspec\n")
+          FileUtils.mkdir_p(File.join(gem_root, "lib"))
+          File.write(File.join(gem_root, "lib", "demo.rb"), "# frozen_string_literal: true\n\nmodule Demo\nend\n")
+          dummy = File.join(gem_root, "test", "dummy")
+          FileUtils.mkdir_p(dummy)
+          capture_io { ProviderGenerator.start(["demo"], destination_root: dummy) }
+
+          assert_path_exists File.join(gem_root, "lib/demo/the_local.rb")
+        end
+      end
     end
   end
 end
