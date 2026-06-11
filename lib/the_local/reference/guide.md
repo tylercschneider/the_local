@@ -12,18 +12,22 @@ the aggregated set from every directly-depended provider into a consuming app's
 
 ### The model
 
-- **Providers register locals.** A gem (or the app) calls `TheLocal.register`
-  at load time, behind a soft `require "the_local"` guard so it works
-  standalone. Each `c.agent` becomes one local.
+- **Providers define locals.** A gem (or the app) calls `TheLocal.register` to
+  declare its locals; each `c.agent` becomes one local. The register block runs
+  only at build time, behind a soft `require "the_local"` guard so the gem still
+  works standalone.
 - **`the_local:build` renders committed `.md`.** The provider runs
   `rake the_local:build`; `TheLocal::Builder` writes each agent to its
   `source_path` under `lib/<gem>/the_local/agents/<prefix>-<name>.md`. The
-  rendered files are committed to the provider's repo — they are the artifact,
-  the register block + `guide.md` are the source of truth.
-- **`the_local:install` / `the_local:refresh` copy verbatim.** In a host app the
-  installer copies each provider's committed `.md` into `.claude/agents/`
-  byte-for-byte (no host-side rendering), so output depends only on the provider
-  gem version — a true carbon copy across every app.
+  rendered files are committed to the provider's repo. **These committed files
+  are the contract** — they are what a host reads. The register block + `guide.md`
+  are the source of truth they're built from.
+- **Install discovers committed `.md` on disk.** In a host, install reads each
+  direct dependency's committed `lib/**/the_local/agents/*.md` straight from its
+  gem path and copies them into `.claude/agents/` byte-for-byte — no provider
+  code is loaded and no register block runs in the host. Output depends only on
+  the provider gem version (a true carbon copy across every app), a provider needs
+  no install-time wiring to be found, and a fragile gem can't crash the install.
 - **The delegation trigger.** Install also writes a registry-generated block into
   the host's `CLAUDE.md`/`AGENTS.md` telling the host agent to delegate to these
   locals. This is what makes delegation actually happen.
@@ -63,9 +67,13 @@ its Rakefile also gets `rake the_local:install`. All three share one engine.
 3. Tailor the register block bodies and `scope` to your gem; the standard
    interface is `info` (read-only explainer), `install` (sets the gem up in a
    host), and a domain worker (`develop` for libraries, `operate` for CLIs).
-4. Run `rake the_local:build` and commit `lib/<gem>/the_local/agents/*.md`
-   alongside the code. A drift test asserting each committed file equals its
-   `agent.to_markdown` keeps the artifact honest.
+4. Run `rake the_local:build`, then **commit and ship**
+   `lib/<gem>/the_local/agents/*.md` (they must be in the gemspec's `files`).
+   This is the whole contract: a host discovers your locals by reading these
+   committed files from your gem on disk — it never loads your gem or runs your
+   register block — so if they aren't committed and shipped, you contribute
+   nothing, and if they are, you contribute everything. A drift test asserting
+   each committed file equals its `agent.to_markdown` keeps the artifact honest.
 
 ### TheLocal.register
 

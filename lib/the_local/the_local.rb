@@ -43,10 +43,12 @@ module TheLocal
                 tools: "Read, Write, Edit, Grep",
                 body: "You turn a gem into a the_local provider following the reference's " \
                       "provider-author workflow: run `the_local:provider`, write guide.md as the " \
-                      "single source of truth (your own gem only), tailor the register block and " \
-                      "scope, hook the_local:build into the Rakefile, and commit " \
-                      "lib/<gem>/the_local/agents/*.md. You keep the committed .md in sync with " \
-                      "agent.to_markdown.",
+                      "single source of truth (your own gem only), tailor the register block, and " \
+                      "hook the_local:build into the Rakefile. The deliverable is the committed, " \
+                      "shipped lib/<gem>/the_local/agents/*.md — that is the whole contract a host " \
+                      "reads from disk; a host never loads the gem, so unless those files are built, " \
+                      "committed, and in the gemspec, the gem contributes nothing. You keep them in " \
+                      "sync with agent.to_markdown.",
                 knowledge: TheLocal::Reference.content
       end
     end
