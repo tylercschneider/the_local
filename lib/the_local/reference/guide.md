@@ -38,7 +38,7 @@ the aggregated set from every directly-depended provider into a consuming app's
 ### Install (in any gem or app)
 
 1. Add the gem to the host's `Gemfile` (until it is on RubyGems, use a git
-   source: `gem "the_local", github: "tylercschneider/the_local"`), then
+   source: `gem "the_local", github: "DYB-Development/the_local"`), then
    `bundle install`.
 2. Run `bundle exec the_local install`. This syncs every direct provider's
    committed locals into `.claude/agents/` and writes the delegation trigger
