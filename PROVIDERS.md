@@ -1,9 +1,10 @@
 # Becoming a provider
 
-`the_local` has two sides. The **consuming-app** side (`bin/rails g
-the_local:install`) installs the locals of an app's direct dependencies into
-`.claude/agents/`. This document covers the **provider** side: how a gem
-contributes the locals an app installs.
+`the_local` has two sides. The **consuming-app** side (`bundle exec the_local
+install`, or `bin/rails g the_local:install` in a Rails app) installs the locals
+of a project's direct dependencies into `.claude/agents/` — by reading each
+dependency's committed `.md` straight from its gem path on disk. This document
+covers the **provider** side: how a gem contributes those locals.
 
 A provider registers its agents with `TheLocal.register` behind a soft
 `require "the_local"` guard, so the gem keeps working when `the_local` is absent.
@@ -13,8 +14,11 @@ A provider registers its agents with `TheLocal.register` behind a soft
 The agent *definition* (`the_local.rb` + `guide.md`) is the single source of
 truth. The provider **renders it to committed `.md` files** with a gem-side
 `the_local:build` task and commits those files to its own repo; the host install
-then **copies them verbatim** into `.claude/agents/`. No rendering happens in the
-host.
+then **reads them straight from your gem's path on disk and copies them verbatim**
+into `.claude/agents/`. No provider code is loaded in the host and no register
+block runs there — the committed, shipped `.md` is the entire contract. If those
+files aren't committed and in the gemspec's `files`, the gem contributes nothing;
+if they are, it contributes everything, with no install-time wiring.
 
 So the rendered output depends only on the provider gem version — every app that
 installs the same version gets a byte-identical local, instead of the host
@@ -120,9 +124,12 @@ itself a non-Rails provider built this way — mirror its own wiring
      # the_local not installed — <gem> works standalone.
    end
    ```
-4. `require_relative "<gem>/the_local"` from the gem's entrypoint, and add
-   `gem "the_local", github: "tylercschneider/the_local"` to the Gemfile
-   (dev/test — it's an optional companion, not a hard dependency).
-5. Add `require "the_local/rake"` to the `Rakefile`, then build and commit the
-   rendered locals — `rake the_local:build && git add lib/<gem>/the_local/agents`.
-   These committed bytes are what the host copies; rebuild on every change.
+4. `require_relative "<gem>/the_local"` from the gem's entrypoint (so your own
+   `the_local:build` and standalone use load the register block — a host never
+   needs it), and add `gem "the_local", github: "tylercschneider/the_local"` to
+   the Gemfile (dev/test — an optional companion, not a hard dependency).
+5. Add `require "the_local/rake"` to the `Rakefile`, then build, commit, and
+   **ship** the rendered locals — `rake the_local:build && git add
+   lib/<gem>/the_local/agents`, and make sure they're in the gemspec's `files`.
+   These committed bytes are the whole contract — what the host reads from disk;
+   rebuild and recommit on every change.
